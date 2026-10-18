@@ -1,0 +1,13 @@
+# Local machine paths, credentials and generated output
+local.properties
+*.jks
+*.keystore
+*.idsig
+*.apk
+*.aab
+*.db
+/build/
+/app/build/
+/.gradle/
+/.kotlin/
+/.idea/
