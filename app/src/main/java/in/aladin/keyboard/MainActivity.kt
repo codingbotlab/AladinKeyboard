@@ -63,6 +63,14 @@ class MainActivity : Activity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // When cloud sync has been explicitly enabled, sync automatically on app open/resume.
+        if (prefs.getBoolean(SupabaseLearningSync.PREF_ENABLED, false)) {
+            SupabaseLearningSync(this, learningDb).sync()
+        }
+    }
+
     private fun setPage(page: LinearLayout) {
         // Keep forms readable on tablets and landscape screens while using the full
         // available width on compact phones.
@@ -163,10 +171,12 @@ class MainActivity : Activity() {
         ))
         val ai = consentCheck("AI local learning: learn word frequency and simple word pairs on this device", "learning_enabled")
         val analytics = consentCheck("Share anonymous usage counts with Aladin admin (device ID and activity times only; never typed text)", "analytics_consent")
+        val cloudLearning = consentCheck("Sync learned word and word-pair COUNTS to Aladin cloud (Supabase). This is optional; no typed sentences or raw keystrokes are uploaded.", SupabaseLearningSync.PREF_ENABLED)
         val ads = consentCheck("Allow advertising to support this project (ad delivery is not active in this build)", "ads_consent")
         val impact = consentCheck("Receive information about environmental and social-impact initiatives", "impact_consent")
         page.addView(ai)
         page.addView(analytics)
+        page.addView(cloudLearning)
         page.addView(ads)
         page.addView(impact)
         page.addView(text(
@@ -177,6 +187,7 @@ class MainActivity : Activity() {
             prefs.edit()
                 .putBoolean("learning_enabled", ai.isChecked)
                 .putBoolean("analytics_consent", analytics.isChecked)
+                .putBoolean(SupabaseLearningSync.PREF_ENABLED, cloudLearning.isChecked)
                 .putBoolean("ads_consent", ads.isChecked)
                 .putBoolean("impact_consent", impact.isChecked)
                 .putBoolean("consent_screen_seen", true)
@@ -187,6 +198,7 @@ class MainActivity : Activity() {
             prefs.edit()
                 .putBoolean("learning_enabled", false)
                 .putBoolean("analytics_consent", false)
+                .putBoolean(SupabaseLearningSync.PREF_ENABLED, false)
                 .putBoolean("ads_consent", false)
                 .putBoolean("impact_consent", false)
                 .putBoolean("consent_screen_seen", true)
@@ -242,6 +254,25 @@ class MainActivity : Activity() {
             13f, Color.LTGRAY
         ))
         page.addView(button("Change privacy and consent choices") { showConsentScreen() })
+        page.addView(text("ALADIN CLOUD SYNC (internet)", 18f, themeAccent()))
+        page.addView(text("Optional HTTPS sync with your Aladin Supabase account. Only learned word counts and word-pair counts sync; raw keystrokes, typed sentences, and passwords are not uploaded.", 13f, Color.LTGRAY))
+        val cloudSync = CheckBox(this).apply {
+            text = "Automatically sync learning counts with Aladin cloud"
+            setTextColor(Color.WHITE)
+            isChecked = prefs.getBoolean(SupabaseLearningSync.PREF_ENABLED, false)
+            setOnCheckedChangeListener { _, checked ->
+                prefs.edit().putBoolean(SupabaseLearningSync.PREF_ENABLED, checked).apply()
+                if (checked) SupabaseLearningSync(this@MainActivity, learningDb).sync(true) { message -> runOnUiThread { Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show() } }
+                else Toast.makeText(this@MainActivity, "Aladin cloud sync paused", Toast.LENGTH_SHORT).show()
+            }
+        }
+        page.addView(cloudSync)
+        page.addView(button("Sync to/from Aladin cloud now") {
+            if (!prefs.getBoolean(SupabaseLearningSync.PREF_ENABLED, false)) {
+                Toast.makeText(this, "First enable cloud sync above; this is optional", Toast.LENGTH_LONG).show()
+            } else SupabaseLearningSync(this, learningDb).sync(true) { message -> runOnUiThread { Toast.makeText(this@MainActivity, message, Toast.LENGTH_LONG).show() } }
+        })
+        page.addView(text("Cloud sync status: ${prefs.getString(SupabaseLearningSync.PREF_STATUS, "Not synced yet")}", 12f, Color.LTGRAY))
         page.addView(text("PC DATABASE SYNC (same Wi-Fi)", 18f, themeAccent()))
         page.addView(text("Only learned word counts and word-pair counts sync. Raw keystrokes, typed sentences and passwords are never sent. PC sync works when both devices are on the same Wi-Fi and the PC receiver is running.", 13f, Color.LTGRAY))
         val autoSync = CheckBox(this).apply {
