@@ -17,6 +17,7 @@ Get the APK from the [latest GitHub release](https://github.com/codingbotlab/Ala
 - Five themes: Midnight, Oasis, Royal, Paper, and Korean Cafe.
 - Optional local learning; users can pause or clear learned data.
 - Export learned word/pair counts as JSON.
+- Optional Supabase cloud sync: when enabled, merges learned word-frequency and word-pair counts to/from the user's isolated cloud account on app open/resume (at most once per 15 minutes), plus a manual sync button.
 - Optional PC sync of learned counts over a private local network.
 - Voice typing delegated to the installed Android speech-recognition provider.
 
@@ -30,6 +31,8 @@ The project uses Android Gradle Plugin and Kotlin Gradle Plugin declarations in 
 
 - The keyboard stores its learning data locally.
 - PC sync sends learned word-frequency counts, word-pair counts, and a device identifier only; it does not intentionally send the raw keystroke stream.
+- Supabase cloud sync is off by default and requires explicit opt-in. It uploads learned word-frequency entries and word-pair entries (these may contain individual words the user typed), but not raw keystroke events, whole typed sentences, or passwords. Data is scoped to a per-install anonymous Supabase account and cannot automatically be recovered on another device unless account linking/sign-in is added later.
+- Supabase Auth must have Anonymous Sign-Ins enabled in the project settings for cloud sync to authenticate. If it is disabled, sync will show an authentication error and local learning remains available.
 - PC sync currently uses plain HTTP and a shared beta token. **Do not enable PC sync on public/untrusted Wi-Fi or expose the PC receiver to the internet.** This sync design needs hardening before a production release.
 - Voice typing is handled by the device's configured speech-recognition provider; its offline/network behavior depends on that provider and Android settings.
 - Password fields are excluded from the keyboard's local learning flow.
