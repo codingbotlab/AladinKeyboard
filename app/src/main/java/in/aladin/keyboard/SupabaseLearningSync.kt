@@ -1,4 +1,4 @@
-package in.aladin.keyboard
+package `in`.aladin.keyboard
 
 import android.content.Context
 import org.json.JSONArray
