@@ -20,7 +20,6 @@ jobs:
           java-version: '17'
       - uses: android-actions/setup-android@v3
         with:
-          cmdline-tools-version: '16.0'
           accept-android-sdk-licenses: true
           packages: 'platform-tools'
       - name: Install Android SDK components
