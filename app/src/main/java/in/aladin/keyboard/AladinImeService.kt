@@ -222,19 +222,23 @@ class AladinImeService : InputMethodService() {
     }
 
     private fun row(keys:List<String>){
+        // Keyboard rows contract on short/landscape displays and expand on taller phones.
+        val keyHeight = if (resources.configuration.screenHeightDp < 620) 34 else if (resources.configuration.screenHeightDp < 760) 38 else 42
         val line=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER}
         keys.forEach{ label->
             val special=label in listOf("↵","space","⇧","⌫","?123","ABC","🌐","😊","☺","🎙")
             val b=TextView(this).apply{
                 text=label;textSize=if(label.length>1)13f else 19f;setTextColor(if (prefs.getString("keyboard_theme", "midnight") in listOf("paper","korean")) Color.rgb(55,35,45) else Color.WHITE);gravity=Gravity.CENTER
                 background=GradientDrawable().apply{setColor(if(special)accent else key);cornerRadius=dp(if (prefs.getString("keyboard_theme", "midnight") == "korean") 18 else 7).toFloat()}
-                setPadding(dp(1),dp(3),dp(1),dp(3));isClickable=true;isFocusable=true
+                setPadding(dp(1),dp(2),dp(1),dp(2));isClickable=true;isFocusable=true
+                contentDescription = label
+                if (android.os.Build.VERSION.SDK_INT >= 26) tooltipText = label
                 setOnClickListener{perform(label);performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)}
             }
             val weight=if(label=="space")4f else if(special)1.35f else 1f
-            line.addView(b,LinearLayout.LayoutParams(0,dp(40),weight).apply{setMargins(dp(2),dp(3),dp(2),dp(3))})
+            line.addView(b,LinearLayout.LayoutParams(0,dp(keyHeight),weight).apply{setMargins(dp(2),dp(2),dp(2),dp(2))})
         }
-        root.addView(line,LinearLayout.LayoutParams(-1,dp(45)))
+        root.addView(line,LinearLayout.LayoutParams(-1,dp(keyHeight + 4)))
     }
     private fun perform(label:String){
         val ic=currentInputConnection?:return

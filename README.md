@@ -1,28 +1,46 @@
-# Aladin Keyboard (Beta)
+# Aladin Keyboard
 
 **Version:** 0.1.0-beta.1  
 **Android application ID:** `in.aladin.keyboard`  
-**Status:** Early beta — testing only, not yet a store-reviewed release.
+**Status:** Free, open-source beta. Not yet store-reviewed.
 
-Aladin Keyboard is an Android keyboard with local word suggestions, optional local learning, and an optional same-Wi-Fi PC learning-count sync feature.
+Aladin Keyboard is an Android input method with word suggestions, optional on-device learning, selectable themes, voice typing through the device's speech-recognition provider, and optional same-Wi-Fi PC learning-count sync.
 
-## Install
+## Download
 
-Download `AladinKeyboard-0.1.0-release.apk` from the GitHub pre-release assets. Android may ask you to allow installation from the browser or file manager. Only install if you trust this beta build. Android 8.0 or newer is required.
+Get the APK from the [latest GitHub release](https://github.com/codingbotlab/AladinKeyboard-Android/releases). Android 8.0 (API 26) or newer is required. This is a beta build; install only if you understand the limitations below.
 
-## Privacy and data
+## What's included
 
-- Typed text and passwords are not intentionally uploaded by the keyboard's PC learning-sync feature; that sync sends learned word counts, word-pair counts, and a device identifier.
-- Local learning is optional and can be paused in the app settings.
-- PC sync is optional and should only be used on a trusted private Wi-Fi network. This beta uses plain HTTP for local-network sync, so do not use PC sync on public Wi-Fi.
-- Voice typing uses Android's speech-recognition intent; speech processing behavior depends on the speech-recognition provider and device settings.
-- The app requests microphone permission for voice typing and network permission for optional PC sync.
-- This is a beta. Review these behaviors and the app's consent screen before using it for sensitive work.
+- Responsive settings screen with a centered, readable layout on wide displays.
+- Keyboard key rows adapt to shorter screens and landscape orientation.
+- Five themes: Midnight, Oasis, Royal, Paper, and Korean Cafe.
+- Optional local learning; users can pause or clear learned data.
+- Export learned word/pair counts as JSON.
+- Optional PC sync of learned counts over a private local network.
+- Voice typing delegated to the installed Android speech-recognition provider.
 
-## Beta limitations
+## Build
 
-This pre-release is intended for manual testing. F-Droid, IzzyOnDroid, Google Play, and other stores have separate metadata, policy, signing, and review requirements; this GitHub release does not mean the app is listed in those stores.
+Open this project in Android Studio and let it install the Android Gradle Plugin and Android SDK components requested by the project. Select the `app` configuration and run it on an Android 8.0+ device or emulator.
 
-## Checksums
+The project uses Android Gradle Plugin and Kotlin Gradle Plugin declarations in the root `build.gradle`. A Gradle wrapper is not included in this beta snapshot; use Android Studio's supported Gradle integration.
 
-The release notes include the SHA-256 checksum for the APK.
+## Privacy and security notes
+
+- The keyboard stores its learning data locally.
+- PC sync sends learned word-frequency counts, word-pair counts, and a device identifier only; it does not intentionally send the raw keystroke stream.
+- PC sync currently uses plain HTTP and a shared beta token. **Do not enable PC sync on public/untrusted Wi-Fi or expose the PC receiver to the internet.** This sync design needs hardening before a production release.
+- Voice typing is handled by the device's configured speech-recognition provider; its offline/network behavior depends on that provider and Android settings.
+- Password fields are excluded from the keyboard's local learning flow.
+- Review the consent screen and privacy notice before use. Do not use this beta for sensitive typing.
+
+See [PRIVACY.md](PRIVACY.md) for the beta privacy notice.
+
+## Store availability
+
+The APK is available from GitHub. Other app stores have their own submission, metadata, policy and review processes; a GitHub release does not mean the app is listed in those stores.
+
+## License
+
+Released under the [MIT License](LICENSE).

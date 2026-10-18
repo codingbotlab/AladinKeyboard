@@ -25,9 +25,28 @@ class MainActivity : Activity() {
     private val learningDb by lazy { AladinLearningDb(this) }
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun text(s: String, size: Float, color: Int = Color.WHITE) =
-        TextView(this).apply { text = s; textSize = size; setTextColor(color) }
+        TextView(this).apply {
+            text = s
+            textSize = size
+            setTextColor(color)
+            setLineSpacing(dp(2).toFloat(), 1.04f)
+            setPadding(0, dp(4), 0, dp(6))
+        }
     private fun button(s: String, action: () -> Unit) =
-        Button(this).apply { text = s; isAllCaps = false; setOnClickListener { action() } }
+        Button(this).apply {
+            text = s
+            isAllCaps = false
+            textSize = 14.5f
+            minHeight = dp(48)
+            setPadding(dp(14), dp(10), dp(14), dp(10))
+            setTextColor(if (prefs.getString("keyboard_theme", "midnight") in listOf("paper", "korean")) Color.rgb(48, 40, 65) else Color.WHITE)
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(themeSurface())
+                cornerRadius = dp(14).toFloat()
+                setStroke(dp(1), themeAccent())
+            }
+            setOnClickListener { action() }
+        }
     private lateinit var learningCheck: CheckBox
     private val createExport = 4102
     private val syncToken = "AladinLocalSync-v1-change-this"
@@ -45,14 +64,42 @@ class MainActivity : Activity() {
     }
 
     private fun setPage(page: LinearLayout) {
-        val scroll = ScrollView(this).apply { isFillViewport = true; addView(page) }
+        // Keep forms readable on tablets and landscape screens while using the full
+        // available width on compact phones.
+        val contentWidth = (resources.displayMetrics.widthPixels - dp(32)).coerceAtLeast(dp(260)).coerceAtMost(dp(720))
+        page.layoutParams = ScrollView.LayoutParams(contentWidth, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+            gravity = android.view.Gravity.CENTER
+        }
+        val scroll = ScrollView(this).apply {
+            isFillViewport = true
+            clipToPadding = false
+            setPadding(0, dp(12), 0, dp(18))
+            setBackgroundColor(themeBackground())
+            addView(page)
+        }
+        window.statusBarColor = themeBackground()
+        window.navigationBarColor = themeBackground()
+        window.decorView.systemUiVisibility =
+            if (prefs.getString("keyboard_theme", "midnight") == "paper") android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or android.view.View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR else 0
         setContentView(scroll)
+    }
+
+    private fun themeSurface(): Int = when (prefs.getString("keyboard_theme", "midnight")) {
+        "oasis" -> Color.rgb(25, 62, 55)
+        "royal" -> Color.rgb(47, 34, 75)
+        "paper" -> Color.rgb(255, 255, 255)
+        "korean" -> Color.rgb(255, 249, 251)
+        else -> Color.rgb(21, 29, 47)
     }
 
     private fun basePage(): LinearLayout = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
-        setPadding(dp(20), dp(22), dp(20), dp(20))
-        setBackgroundColor(themeBackground())
+        setPadding(dp(20), dp(22), dp(20), dp(22))
+        background = android.graphics.drawable.GradientDrawable().apply {
+            setColor(themeSurface())
+            cornerRadius = dp(24).toFloat()
+            setStroke(dp(1), if (prefs.getString("keyboard_theme", "midnight") == "paper") Color.rgb(224, 229, 239) else Color.rgb(55, 67, 95))
+        }
     }
 
     private fun themeBackground(): Int = when (prefs.getString("keyboard_theme", "midnight")) {
