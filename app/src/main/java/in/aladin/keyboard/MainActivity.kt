@@ -67,7 +67,7 @@ class MainActivity : Activity() {
         // Keep forms readable on tablets and landscape screens while using the full
         // available width on compact phones.
         val contentWidth = (resources.displayMetrics.widthPixels - dp(32)).coerceAtLeast(dp(260)).coerceAtMost(dp(720))
-        page.layoutParams = ScrollView.LayoutParams(contentWidth, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+        page.layoutParams = android.widget.FrameLayout.LayoutParams(contentWidth, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
             gravity = android.view.Gravity.CENTER
         }
         val scroll = ScrollView(this).apply {
